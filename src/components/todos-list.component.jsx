@@ -4,30 +4,13 @@ import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "@fullcalendar/react/dist/vdom";
 import FullCalendar from "@fullcalendar/react";
-import DatePicker from "react-date-picker";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  getTodos,
-  deleteTodos,
-  findByTitle,
-} from "../api/index.jsx";
-
-const formatDate = (date) => {
-  var d = new Date(date),
-    month = "" + (d.getMonth() + 1),
-    day = "" + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = "0" + month;
-  if (day.length < 2) day = "0" + day;
-
-  return [year, month, day].join("-");
-};
-
+import DatePicker from "react-date-picker";
+import { useQuery } from "@tanstack/react-query";
+import { getTodos, deleteTodos, findByTitle } from "../api/index.jsx";
+import { formatDate } from "./utils"
 
 const TodosList = () => {
-  // const queryClient = useQueryClient();
   const datePicker = useRef({ isOpen: true });
 
   const [currentTodo, setCurrentTodo] = useState({
@@ -37,8 +20,7 @@ const TodosList = () => {
     dueDate: formatDate(new Date()),
   });
 
-  const [todos, setTodos] = useState(null)
-
+  const [todos, setTodos] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [searchTitle, setSearchTitle] = useState("");
 
@@ -60,36 +42,26 @@ const TodosList = () => {
   } = useQuery({
     queryKey: ["todos"],
     queryFn: getTodos, // fetch the posts using the async call
-    onSuccess: (data) => setTodos(data)
+    onSuccess: (data) => setTodos(data),
   });
-
-  //   const checkCurrentIndex = () => {
-  //     if (!currentIndex) {
-  //       // dispatch(setCurrentTodo(JSON.parse(localStorage.getItem('currentTodo'))));
-  //       // dispatch(setCurrentIndex(JSON.parse(localStorage.getItem('currentIndex'))));
-  //     }
-  //   };
 
   const onChangeSearchTitle = (event) => {
     event.preventDefault(); // prevent a browser reload/refresh
-    setSearchTitle(event.target.value)
+    setSearchTitle(event.target.value);
   };
 
   const refreshList = () => {
     getTodos();
-    setCurrentTodo(null)
+    setCurrentTodo(null);
     setCurrentIndex(-1);
   };
 
-
   const setActiveTodo = (todo, index) => {
-    setCurrentTodo(todo)
+    setCurrentTodo(todo);
     setCurrentIndex(index);
     if (datePicker && datePicker.current && datePicker.current.openCalendar) {
       datePicker.current.openCalendar();
     }
-    localStorage.setItem("currentTodo", JSON.stringify(todo));
-    localStorage.setItem("currentIndex", JSON.stringify(currentIndex));
   };
 
   const removeAllTodos = () => {
@@ -100,11 +72,10 @@ const TodosList = () => {
   const findItemByTitle = () => {
     let t = findByTitle(searchTitle);
     t.then((data) => {
-      setTodos(data)
+      setTodos(data);
       setCurrentTodo(null);
       setCurrentIndex(-1);
-    })
-
+    });
   };
 
   // const {
@@ -114,12 +85,10 @@ const TodosList = () => {
   //   data: todo,
   //   // error,
   // } = useQuery({
-  //   // queryKey: ["posts", id],
   //   queryKey: ["todos"],
   //   queryFn: () => findByTitle(searchTitle),
   //   // onSuccess: (todo) => setCurrentTodo(todo),
   // });
-
 
   if (isLoading) return "loading...";
   if (isError) return `Error: ${error.message}`;

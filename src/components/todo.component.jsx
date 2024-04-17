@@ -1,42 +1,17 @@
-import React, { useState, useEffect } from "react";
-// import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DatePicker from "react-date-picker";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { getTodo, updateTodo, deleteTodo } from "../api/index";
+import { formatDate } from "./utils"
 
-// import {
-//   setCurrentTodo,
-//   setMessage,
-//   updateTodo,
-//   deleteTodo,
-// } from "../redux/actions";
-// import { selectCurrentTodo, selectMessage } from "../redux/selectors";
 
-const formatDate = (date) => {
-  var d = new Date(date),
-    month = "" + (d.getMonth() + 1),
-    day = "" + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = "0" + month;
-  if (day.length < 2) day = "0" + day;
-
-  return [year, month, day].join("-");
-};
-
-const Todo = (props) => {
-  // const dispatch = useDispatch();
-  // const currentTodo = useSelector(selectCurrentTodo);
-  // const message = useSelector(selectMessage);
-
-  // localStorage.setItem("currentTodo", JSON.stringify(todo));
-  // localStorage.setItem("currentIndex", JSON.stringify(currentIndex));
-  // let currentTodo = null
-  // let currentIndex = null
+const Todo = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   const [currentTodo, setCurrentTodo] = useState({
     title: "",
@@ -45,20 +20,18 @@ const Todo = (props) => {
     dueDate: formatDate(new Date()),
   });
 
-  // const [currentIndex, setCurrentIndex] = useState(-1);
-
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const [dateValue, onChange] = useState(
+    new Date(
+      currentTodo && currentTodo.dueDate ? currentTodo.dueDate : new Date()
+    )
+  );
 
   const {
     isLoading,
     isError,
-    // data: post,
     data: todo,
     error,
   } = useQuery({
-    // queryKey: ["posts", id],
     queryKey: ["todos", id],
     queryFn: () => getTodo(id),
     onSuccess: (todo) => setCurrentTodo(todo),
@@ -72,10 +45,17 @@ const Todo = (props) => {
     },
   });
 
+  const updateTodoUnderEdit = (status = null) => {
+    currentTodo.dueDate = dateValue;
+    if (status !== null) {
+      currentTodo.status = status;
+    }
+    updateTodoMutation.mutate({ id, ...currentTodo });
+  };
+
   const deleteTodoMutation = useMutation({
     mutationFn: deleteTodo,
     onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['posts']});
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       navigate("/");
     },
@@ -85,64 +65,19 @@ const Todo = (props) => {
     deleteTodoMutation.mutate(id);
   };
 
-  const [dateValue, onChange] = useState(
-    new Date(
-      currentTodo && currentTodo.dueDate ? currentTodo.dueDate : new Date()
-    )
-  );
-
-  // useEffect(() => {
-  //   // clearMessage();
-  //   checkLocalStorage();
-  // }, []);
-
-  if (isLoading) return "loading...";
-  if (isError) return `Error: ${error.message}`;
-
-  // const clearMessage = () => dispatch(setMessage(""));
-
-  // const checkLocalStorage = () => {
-  //   if (!currentTodo) {
-  //     let todo = localStorage.getItem("currentTodo");
-  //     let index = localStorage.getItem("currentIndex")
-  //     // dispatch(setCurrentTodo(JSON.parse(todo)));
-  //     // currentTodo = JSON.parse(todo)
-  //     setCurrentTodo(JSON.parse(todo));
-  //     // currentIndex = JSON.parse(index)
-  //     setCurrentIndex(JSON.parse(index));
-  //   }
-  // };
+  const deleteTodoUnderEdit = () => {
+    handleDelete(currentTodo._id);
+    navigate("/");
+  };
 
   const handleInputChange = (event) => {
     event.preventDefault(); // prevent a browser reload/refresh
     const { name, value } = event.target;
-
-    // console.log('----')
-    // console.log(name);
-    // console.log(value);
-
-    // dispatch(setCurrentTodo({ ...currentTodo, [name]: value }));
-    // currentTodo = { ...currentTodo, [name]: value }
-
     setCurrentTodo({ ...currentTodo, [name]: value });
-    // console.log('currentTodo: ', currentTodo)
   };
 
-  const updateTodoUnderEdit = (status = null) => {
-    currentTodo.dueDate = dateValue;
-    if (status !== null) {
-      currentTodo.status = status;
-    }
-    // dispatch(updateTodo({ id: currentTodo._id, todo: currentTodo }));
-
-    updateTodoMutation.mutate({ id, ...currentTodo });
-  };
-
-  const deleteTodoUnderEdit = () => {
-    // dispatch(deleteTodo({ id: currentTodo._id }));
-    handleDelete(currentTodo._id);
-    // props.history.push("/todos");
-  };
+  if (isLoading) return "loading...";
+  if (isError) return `Error: ${error.message}`;
 
   return (
     <div>

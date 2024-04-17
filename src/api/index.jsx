@@ -19,16 +19,15 @@ export async function addTodo(newPost) {
   return response.json();
 }
 
-export async function updateTodo(updatedPost) {
+export async function updateTodo(updatedTodo) {
   const response = await fetch(
-    // `http://localhost:8080/api/todos/${updatedPost.id}/edit`,
-    `http://localhost:8080/api/todos/${updatedPost.id}`,
+    `http://localhost:8080/api/todos/${updatedTodo.id}`,
     {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedPost),
+      body: JSON.stringify(updatedTodo),
     }
   );
   return response.json();
