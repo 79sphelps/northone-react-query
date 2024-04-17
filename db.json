@@ -1,0 +1,19 @@
+{
+    "posts": [
+      {
+        "id": "b010dffa-2201-4e52-a95f-ef096fd4937d",
+        "title": "New new title",
+        "body": "new new body"
+      },
+      {
+        "id": "41ec4282-2144-4180-84a4-ad7cd319aece",
+        "title": "New Title today",
+        "body": "This is my new body"
+      },
+      {
+        "id": "dcd61e80-47b3-4459-9371-321e9f228995",
+        "title": "My 1st title",
+        "body": "My 1st body"
+      }
+    ]
+  }
