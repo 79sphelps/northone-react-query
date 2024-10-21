@@ -1,3 +1,13 @@
+# NorthOne React Query
+Basic React/TanStack Query project leveraging a MongoDB Cloud Atlas backend database. Use of Bootstrap and FontAwesome for styling. Use of the fullcalendar daygrid and react packages as well.
+
+FrontEnd Features:
+React frontend using TanStack Query for asynchronous calls, declarative, always-up-to-date auto-managed queries and mutations.
+
+Functionality: basic CRUD requirements and search, calendar display
+3 routes: list, edit, add
+3 components
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
